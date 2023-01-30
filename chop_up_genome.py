@@ -4,20 +4,24 @@ import argparse
 from Bio import SeqIO
 import random
 
+#####___TEST___#####
+# chop_up_genome.py -g ./example.fasta -o ./output_example.fasta -l 100
 
-#chop_up_genome.py -g ./example.fasta -o ./output_example.fasta -l 100
 
+#####___EXAMPLE___#####
 # export N=500000
 # ./chop_up_genome.py -g ../augustify_modification/genome.fasta.masked -info ./fly_${N}bp.txt -o ./fly_${N}bp_genome.fasta -l=${N} -n=0
+# and then mapp the genome annotation (annot.gtf) to this set of fragments:
+# convert_coordinates_in_gtfs.py -g ./fly_${N}bp_genome.fasta -a ./annot.gtf -o annot_mapped.gtf
 
 
-# TEST
-# 1500, 3000, 6000, 15000, 50000, 100000, 500000
-
+#####___INFO___#####
+# fragment lengths: 1500, 3000, 6000, 15000, 50000, 100000, 500000
 # nucleotides per line = 60
 # fragments = 10                      # how many fragments should one sequence be divided into
 # n_overlapped = 30                   # the new sequences should overlap by N nucleotides
 # fragment_length = 100               # the lengths of new sequences
+
 
 parser = argparse.ArgumentParser()
 
@@ -77,7 +81,6 @@ def get_subsequences(sequence, sub_length, overlapping):
     #print("__________________________________________________")
     return res
 
-
 n_overlapped = args.n_overlapped
 fragment_length = args.fragment_length
 
@@ -94,6 +97,7 @@ with open(args.output_info, "w") as f:
     f.write("\n")
     f.write('========================================================' + "\n")
     f.write('seq_id' + '\t' + 'total_length' + "\t" + 'fragments' + "\n")
+
 
 
     print("Overlapping windows : " + str(n_overlapped))
@@ -128,6 +132,7 @@ with open(args.output_info, "w") as f:
                                             sub_length=fragment_length,
                                             overlapping=n_overlapped)
                 for idx, sub_seq_record in enumerate(sub_seqs):
+
                     sub_seq_record.id = 'sub_seq_number=' + str(idx + 1) + ';' + sub_seq_record.id
                     sub_seq_record.description = sub_seq_record.id
                     sub_seq_record.name = sub_seq_record.id
@@ -140,6 +145,8 @@ with open(args.output_info, "w") as f:
                 else: # randomly select suq_sequences without repeats
                     sub_seqs = random.choices(list(sub_seqs), k=n_fragments)
                     SeqIO.write(sub_seqs, out, 'fasta')
+
+
 
 ########################################################################################################################
 # 1. add function to transform/map global coordinates of annot.gtf & pseudo.gff3 to fragment coordinates (see drawing) - DONE (I decided to put it in a separate script)
