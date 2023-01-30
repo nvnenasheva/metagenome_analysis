@@ -98,13 +98,17 @@ with open(args.output_info, "w") as f:
 
     print("Overlapping windows : " + str(n_overlapped))
     print("Fragment lengths : " + str(fragment_length))
-    print(f"Write {n_fragments} for each sequence to output fasta file")
+    print(f"Try to write {n_fragments} for each sequence to output fasta file")
     print("========================================================")
 
     with open(args.genome) as inp, open(args.output_fasta, 'w') as out:
 
         for seq_record in SeqIO.parse(args.genome, "fasta"):
-            f.write('%s\t%i\t%i' % (seq_record.id, len(seq_record.seq), len(seq_record.seq) // fragment_length))
+            if len(seq_record.seq) % fragment_length > 0:
+                fragments_total_number = len(seq_record.seq) // fragment_length + 1 # add +1, because we have t take into account a tail_fragment too!
+            else:
+                fragments_total_number = len(seq_record.seq) // fragment_length        # length of the tail_fragment is equal to zero
+            f.write('%s\t%i\t%i' % (seq_record.id, len(seq_record.seq), fragments_total_number))
             f.write("\n")
 
             if len(seq_record.seq) <= fragment_length:
@@ -128,44 +132,15 @@ with open(args.output_info, "w") as f:
                     sub_seq_record.description = sub_seq_record.id
                     sub_seq_record.name = sub_seq_record.id
 
+                if n_fragments != "all" and int(n_fragments) > fragments_total_number:  # if the user tries to extract more fragments than there actually are, the program will process as many as there are available
+                    n_fragments = "all"
+
                 if n_fragments == 'all':
                     SeqIO.write(sub_seqs, out, 'fasta')
-                else:
-                    # randomly select suq_sequences without repeats
+                else: # randomly select suq_sequences without repeats
                     sub_seqs = random.choices(list(sub_seqs), k=n_fragments)
                     SeqIO.write(sub_seqs, out, 'fasta')
 
-
-
-
-
-
 ########################################################################################################################
-
-
-'''
-with open(corrected_file) as corrected:
-    records = SeqIO.parse(corrected, 'fasta')
-    for record in records:
-        print("####################")
-        print(record.id)            # prints bar
-        print(record.name)           # prints bar
-        print(record.description)
-
-'''
-
-# TEST
-'''
-with open(args.genome) as inp:
-    for seq_record in SeqIO.parse(args.genome, "fasta"):
-        sub = get_subsequences(sequence=seq_record,
-                         sub_length=100,
-                         overlapping=20)
-
-
-        for idx, sub_seq_record in enumerate(sub):
-            sub_seq_record.id = 'sub_seq_number=' + str(idx+1) + ';' + sub_seq_record.id
-            sub_seq_record.description = 'sub_seq_number=' + str(idx+1) + ';' + sub_seq_record.id
-            print(sub_seq_record.id)
-        #seq_record.id = name_to_add
-        #seq_record.description = name_to_add'''
+# 1. add function to transform/map global coordinates of annot.gtf & pseudo.gff3 to fragment coordinates (see drawing) - DONE (I decided to put it in a separate script)
+# 2. catch when you try to generate more fragments than sanely possible (if we want to get 10 fragments, but in fact we just have 6, for example) - DONE
