@@ -1,7 +1,7 @@
 # metagenome_analysis
 The repository contains additional scripts for the analysis of metagenomic data.
 
-## Chop_up_genome.py
+## chop_up_genome.py
 
 This program splits the input into a set of subsequences. 
 There are several additional options:
