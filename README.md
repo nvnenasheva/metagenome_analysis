@@ -13,7 +13,7 @@ There are several additional options:
 ## convert_coordinates_in_gtfs.py
 The main goal of this script is to map global coordinates from annot.gtf file to coordinates of genome sequence fragments.
 
-These two scripts coulb be used together:
+These two scripts could be used together:
 ```
 export N=500000
 chop_up_genome.py -g genome.fasta.masked -info fly_${N}bp.txt -o fly_${N}bp_genome.fasta -l=${N} -n=0
