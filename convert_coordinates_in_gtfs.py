@@ -15,10 +15,10 @@ import glob
 
 
 #####___INFO___#####
-genome = '/home/natalia/PycharmProjects/pythonProject/chop_up_genome/output_example.fasta'
-ann = './annot.gtf'
-out_bed = "tmp.bed" # Output bed file (intermediate file)
-out_ann = 'annot_mapped.gtf'
+# genome = '/home/natalia/PycharmProjects/pythonProject/chop_up_genome/output_example.fasta'
+# annotation = './annot.gtf'
+# out_bed = "tmp.bed" # Output bed file (intermediate file)
+# out_annot = 'annot_mapped.gtf'
 
 
 parser = argparse.ArgumentParser()
