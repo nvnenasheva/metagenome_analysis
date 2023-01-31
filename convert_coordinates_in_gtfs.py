@@ -8,6 +8,8 @@ import pandas as pd
 import numpy as np
 import os
 import glob
+
+
 #####___EXAMPLE___#####
 # convert_coordinates_in_gtfs.py -g /home/natalia/PycharmProjects/pythonProject/chop_up_genome/fly_15000bp_genome.fasta -a ./annot.gtf -o ./annot_mapped.gtf -l=15000
 
@@ -32,7 +34,7 @@ parser.add_argument('-o', '--out_annot', required=True, type=str,
 
 args = parser.parse_args()
 
-
+#####___FUNCTIONS___#####
 def find_pattern(s, start, end):
     return (s.split(start))[1].split(end)[0]
 
@@ -118,6 +120,7 @@ def remove_tmp():
         
         
 #=======================================================================================================================
+#####___MAIN___#####
 
 get_bed_file(fasta=args.genome,
              out_bed="tmp.bed")
