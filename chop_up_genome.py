@@ -8,22 +8,31 @@ import random
 # chop_up_genome.py -g ./example.fasta -o ./output_example.fasta -l 100
 
 
-#####___EXAMPLE___#####
+#####___USAGE_EXAMPLE___#####
+# use lengths = 1500, 3000, 6000, 15000, 50000, 100000, 500000
 # export N=500000
-# ./chop_up_genome.py -g ../augustify_modification/genome.fasta.masked -info ./fly_${N}bp.txt -o ./fly_${N}bp_genome.fasta -l=${N} -n=0
-# and then mapp the genome annotation (annot.gtf) to this set of fragments:
-# convert_coordinates_in_gtfs.py -g ./fly_${N}bp_genome.fasta -a ./annot.gtf -o annot_mapped.gtf
+# ./chop_up_genome.py -g ../augustify_modification/genome.fasta.masked -info ./fly_${N}bp_info.txt -headers ./headers_${N}.txt -o ./fly_${N}bp_genome.fasta -l=${N} -n=0
+# and then map the genome annotation (annot.gtf) to this set of fragments:
+# ./convert_coordinates_in_gtfs.py -headers ./headers_${N}.txt -a ./annot.gtf -o annot_mapped_${N}.gtf -l=${N}
 
 
 #####___INFO___#####
 # fragment lengths: 1500, 3000, 6000, 15000, 50000, 100000, 500000
+
 # nucleotides per line = 60
 # fragments = 10                      # how many fragments should one sequence be divided into
 # n_overlapped = 30                   # the new sequences should overlap by N nucleotides
 # fragment_length = 100               # the lengths of new sequences
 
+__author__ = "Natalia Nenasheva"
+__email__ = "nenashen66@uni-greifswald.de"
+__status__ = "development"
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='chop_up_sgenome.py allows to create an artificial genome from the input genomic sequence, consisting of short sequences. ' +
+                                             'It is easy to specify the length of the fragments into which you want to split (-l/--fragment_length), ' +
+                                             'randomly select several fragments for each sequence from the original file (-f/--n_fragments), ' +
+                                             'and also select fragments taking into account overlappping (-n/--n_overlapped).'
+                                             'In addition to the output_fasta file, a file with general information is also created (specified by -info/--output_info). ')
 
 parser.add_argument('-g', '--genome', required=True, type=str,
                     help='Genome fasta file (possibly softmasked)')
@@ -31,15 +40,19 @@ parser.add_argument('-o', '--output_fasta', required=True, type=str,
                     help='Genome fasta file that includes subsequences')
 parser.add_argument('-info', '--output_info', required=False, type=str, default='output_info.txt',
                     help='Output file contains additional information about input sequences.')
+parser.add_argument('-headers', '--extended_headers', required=False, type=str, default='headers.txt',
+                    help='Output file contains extended information about subsequences into which we split the genome.')
 parser.add_argument('-l', '--fragment_length', required=True, type=int,
-                    help='the lengths of new sequences')
+                    help='It is the lengths of new sequences')
 parser.add_argument('-n', '--n_overlapped', required=False, type=int, default=0,
-                    help='new sequences should overlap by N nucleotides')
+                    help='his key specifies that new sequences should overlap by N nucleotides.')
 parser.add_argument('-f', '--n_fragments', required=False, type=int,
-                    help='how many fragments (sub sequences) per sequence have to be save to output.fasta; these fragments will be selected randomly.')
-
-
+                    help='This key specifies how many fragments (sub sequences) per sequence have to be save to output.fasta; these fragments will be selected randomly.')
 args = parser.parse_args()
+
+
+''' ******************* BEGIN FUNCTIONS *************************************'''
+
 
 def get_subsequences(sequence, sub_length, overlapping):
     res = []
@@ -52,7 +65,6 @@ def get_subsequences(sequence, sub_length, overlapping):
         sequence.id = name_to_add
         sequence.description = name_to_add
         res.append(sequence[idx: idx + sub_length])
-        #print("start_ind :", idx, "; end_idx :", idx + sub_length, " for ", initial_name)
 
         if overlapping == 0:                                # case without overalpping: n_overlapped = 0
             last_length = len(sequence) % sub_length        # how many nucleotides do we have in the last fragment?
@@ -78,8 +90,11 @@ def get_subsequences(sequence, sub_length, overlapping):
                 res.append(sequence[new_ind:])
 
     print(str(len(res)) + " subsequences for " + initial_name)
-    #print("__________________________________________________")
     return res
+
+
+''' ******************* END FUNCTIONS *************************************'''
+
 
 n_overlapped = args.n_overlapped
 fragment_length = args.fragment_length
@@ -98,20 +113,18 @@ with open(args.output_info, "w") as f:
     f.write('========================================================' + "\n")
     f.write('seq_id' + '\t' + 'total_length' + "\t" + 'fragments' + "\n")
 
-
-
     print("Overlapping windows : " + str(n_overlapped))
     print("Fragment lengths : " + str(fragment_length))
     print(f"Try to write {n_fragments} for each sequence to output fasta file")
     print("========================================================")
 
-    with open(args.genome) as inp, open(args.output_fasta, 'w') as out:
+    with open(args.genome) as inp, open(args.output_fasta, 'w') as out, open(args.extended_headers, 'w') as headers:
 
-        for seq_record in SeqIO.parse(args.genome, "fasta"):
+        for seq_record in SeqIO.parse(inp, "fasta"):
             if len(seq_record.seq) % fragment_length > 0:
-                fragments_total_number = len(seq_record.seq) // fragment_length + 1 # add +1, because we have t take into account a tail_fragment too!
+                fragments_total_number = len(seq_record.seq) // fragment_length + 1                                     # added +1, because we have t take into account a tail_fragment too!
             else:
-                fragments_total_number = len(seq_record.seq) // fragment_length        # length of the tail_fragment is equal to zero
+                fragments_total_number = len(seq_record.seq) // fragment_length                                         # length of the tail_fragment is equal to zero
             f.write('%s\t%i\t%i' % (seq_record.id, len(seq_record.seq), fragments_total_number))
             f.write("\n")
 
@@ -122,6 +135,11 @@ with open(args.output_info, "w") as f:
                               'sub_seq_end=' + str(len(seq_record.seq) - 1) + ';' + \
                               'source_name=' + seq_record.id + ';' + \
                               'source_len=' + str(len(seq_record.seq)) + ';'
+
+                headers.write(name_to_add)
+                headers.write('\n')
+                name_to_add = initial_name + '_' + '1'
+
                 seq_record.id = name_to_add
                 seq_record.description = name_to_add
                 SeqIO.write(seq_record, out, 'fasta')
@@ -133,11 +151,17 @@ with open(args.output_info, "w") as f:
                                             overlapping=n_overlapped)
                 for idx, sub_seq_record in enumerate(sub_seqs):
 
-                    sub_seq_record.id = 'sub_seq_number=' + str(idx + 1) + ';' + sub_seq_record.id
+                    name_to_add = 'sub_seq_number=' + str(idx + 1) + ';' + sub_seq_record.id
+
+                    sub_seq_record.id = sub_seq_record.id.split('source_name=')[1].split(';')[0] + '_' + str(idx + 1)
                     sub_seq_record.description = sub_seq_record.id
                     sub_seq_record.name = sub_seq_record.id
 
-                if n_fragments != "all" and int(n_fragments) > fragments_total_number:  # if the user tries to extract more fragments than there actually are, the program will process as many as there are available
+                    headers.write(name_to_add)
+                    headers.write('\n')
+
+
+                if n_fragments != "all" and int(n_fragments) > fragments_total_number:                                  # if the user tries to extract more fragments than there actually are, the program will process as many as there are available
                     n_fragments = "all"
 
                 if n_fragments == 'all':
@@ -145,9 +169,3 @@ with open(args.output_info, "w") as f:
                 else: # randomly select suq_sequences without repeats
                     sub_seqs = random.choices(list(sub_seqs), k=n_fragments)
                     SeqIO.write(sub_seqs, out, 'fasta')
-
-
-
-########################################################################################################################
-# 1. add function to transform/map global coordinates of annot.gtf & pseudo.gff3 to fragment coordinates (see drawing) - DONE (I decided to put it in a separate script)
-# 2. catch when you try to generate more fragments than sanely possible (if we want to get 10 fragments, but in fact we just have 6, for example) - DONE
