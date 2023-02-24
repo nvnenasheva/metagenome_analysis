@@ -10,7 +10,7 @@ There are several additional options:
 3) you can choose a randomly selected pool of subsequences (-f option is the number of subsequences for each sequence)
 
 ## get_genome_fraction.py
-The goal of this script is to reduce the size of input genome => it helps to take only 25% (might be changed) randomly selected from the genomes.
+The goal of this script is to reduce the size of input genome => it helps to take only 25% (-f=0.25) of total amount of data randomly.
 
 ## convert_coordinates_in_gtfs.py
 The main goal of this script is to map global coordinates from annot.gtf file to coordinates of genome sequence fragments.
