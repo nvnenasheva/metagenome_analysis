@@ -9,17 +9,22 @@ There are several additional options:
 2) splitting can be done taking into account the overlapping of subsequences on top of each other (-n option)
 3) you can choose a randomly selected pool of subsequences (-f option is the number of subsequences for each sequence)
 
+## get_genome_fraction.py
+The goal of this script is to reduce the size of input genome => it helps to take only 25% (might be changed) randomly selected from the genomes.
 
 ## convert_coordinates_in_gtfs.py
 The main goal of this script is to map global coordinates from annot.gtf file to coordinates of genome sequence fragments.
 
-These two scripts could be used together:
+These three scripts could be used together:
 ```
 export N=500000
 chop_up_genome.py -g genome.fasta.masked -info fly_${N}bp.txt -o fly_${N}bp_genome.fasta -l=${N} -n=0
 
+# extract 25% sequences randomly
+get_genome_fraction.py -g fly_${N}bp_genome.fasta -o fly_${N}bp_genome_reduced.fasta -f=0.25
+
 # and then mapp the genome annotation (annot.gtf) to this set of fragments:
-convert_coordinates_in_gtfs.py -g fly_${N}bp_genome.fasta -a annot.gtf -o annot_mapped.gtf
+convert_coordinates_in_gtfs.py -g fly_${N}bp_genome_reduced.fasta -a annot.gtf -o annot_mapped.gtf
 
 # our results: annot_mapped.gtf and fly_${N}bp_genome.fasta
 ```
