@@ -93,7 +93,7 @@ def transform_coordinates(dict_child_names, ann_mapped, fragment_length):
     df['ch_seq'] = df['additional_info'].map(d)
 
    # find coordinates for hints from annotation_mapped in fragments of sequences
-    df['ch_hit_start'] = (df['p_start'] + 1 - ((df['fragment_num'].astype(int) - 1) * (df['ch_end'] - df['ch_start']))).astype(int)  # coordinates in annotations starts from 1, in fasta - from 0!!!
+    df['ch_hit_start'] = (df['p_start'] - ((df['fragment_num'].astype(int) - 1) * (df['ch_end'] - df['ch_start']))).astype(int)  # coordinates in annotations starts from 1, in fasta - from 0!!!
     df['ch_hit_end'] = (df['ch_hit_start'] + (df['p_end'] - df['p_start'] )).astype(int)
 
    # then save them into the dataframe
