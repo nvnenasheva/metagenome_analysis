@@ -15,13 +15,15 @@ __status__ = "development"
 parser = argparse.ArgumentParser()
 parser = argparse.ArgumentParser(description='This script reduce the genome of the model organism: take only 25% (--fraction/-f parameter) randomly selected from the genomes.' +
                                              'The program takes a genomic file with sequences as input. The output file contains a set (a fraction of the input set) of randomly' +
-                                             ' selected sequences. The names of the selected sequences are saved to a intermediate file fraction_random_headers.txt')
+                                             ' selected sequences. The names of the selected sequences are saved to a intermediate file random_headers.txt')
 parser.add_argument('-g', '--genome', required=True, type=str,
                     help='Genome fasta file (possibly softmasked)')
 parser.add_argument('-o', '--output_fasta', required=True, type=str,
                     help='Genome fasta file that includes subsequences')
 parser.add_argument('-f', '--fraction', required=True, type=float, default=0.25,
                     help='Proportion of genomic sequences to be selected.')
+parser.add_argument('-headers', '--random_headers_file', required=False, type=str, default='random_headers.txt',
+                    help='Name of the file to save randomly selected headers.')
 args = parser.parse_args()
 
 #####___INFO___#####
@@ -92,11 +94,12 @@ def select_headers_randomly(fasta_inp, random_headers_file, fraction):
 
     save_random_headers(random_headers_list=rand_headers,
                         random_headers_file=random_headers_file)
-    print("1. Save randomly selected sequences headers to file: ", random_headers)
+    print("1. Save randomly selected sequences headers to file: ", args.random_headers_file)
 
 ''' ******************* END FUNCTIONS *************************************'''
 
-random_headers = 'fraction_random_headers.txt'
-select_headers_randomly(args.genome, random_headers, args.fraction)
-get_genome_fraction(args.genome, random_headers, args.output_fasta)
+#random_headers = 'random_headers.txt'
+select_headers_randomly(args.genome, args.random_headers_file, args.fraction)
+get_genome_fraction(args.genome, args.random_headers_file, args.output_fasta)
 print("2. Got small fasta file with randomly selected sequences: ", args.output_fasta)
+
