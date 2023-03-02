@@ -27,5 +27,9 @@ export N=500000
 # extract 25% sequences randomly:
 ./get_genome_fraction.py -g fly_${N}bp_genome.fasta -o fly_${N}bp_genome_reduced.fasta -f=0.25 -headers=random_headers_${N}.txt
 
-# result: annot_mapped_${N}.gtf and ffly_${N}bp_genome_reduced.fasta
+# intermediate result: annot_mapped_${N}.gtf and ffly_${N}bp_genome_reduced.fasta
+
+# divide data according to the scpecies assigned by Augustify - useful to run braker pipeline
+./prepare_contigs.py ...
+
 ```
