@@ -1,8 +1,33 @@
 #!/usr/bin/env python3
-import re
+import argparse
 import pandas as pd
 import os
 from Bio import SeqIO
+
+__author__ = "Natalia Nenasheva"
+__email__ = "nenashen66@uni-greifswald.de"
+__status__ = "development"
+
+#####___USAGE_EXAMPLE___#####
+# ./prepare_contigs.py -g ./genomes/fly_1500bp_genome_reduced.fasta -a ./annotations/annot_mapped_1500.gtf -p ./pseudogenes/pseudo_mapped_1500.gff3 -c ./test/test_contigs.txt -o ./data_contig_based
+
+
+parser = argparse.ArgumentParser(description='After Augustify has picked/assigned parameters, it is possible to pull together all sequences with each parameter set & the annotations into separate files ' +
+                                             '(3 files per parameter set that was ever assigned: genome, annotation, pseudogenes). ' +
+                                             'Then these three sets of files might be used to run BRAKER. ' +
+                                             'Thus, this script groups data from fasta and gtf files according to the species type assigned by the Augustify.')
+
+parser.add_argument('-g', '--genome', required=True, type=str,
+                    help='Genome fasta file (possibly softmasked).')
+parser.add_argument('-a', '--annotation', required=True, type=str,
+                    help='Annotation gtf file.')
+parser.add_argument('-p', '--pseudogenes', required=True, type=str,
+                    help='File with pseudogenes.')
+parser.add_argument('-c', '--contigs', required=True, type=str,
+                    help='parameters2contigs.lst from Augustify (parameters2contigs.lst may be got with flag -m).')
+parser.add_argument('-o', '--out_dir', required=False, type=str,
+                    help='Output directory to save all of the files.')
+args = parser.parse_args()
 
 ''' ******************* BEGIN FUNCTIONS *************************************'''
 
@@ -42,19 +67,19 @@ def get_gff(gtf_inp, dict, type):
 
 ''' ******************* END FUNCTIONS *************************************'''
 
-fasta_inp = './genomes/fly_1500bp_genome_reduced.fasta'
-contigs = './test/test_contigs.txt'
-ann = './annotations/annot_mapped_1500.gtf'
-pseudo = './pseudogenes/pseudo_mapped_15000.gtf'
+if args.out_dir:
+    directory = args.out_dir
+else:
+    directory = "data_contig_based"
 
-directory = "data_contig_based"
 if not os.path.exists(directory):
     os.makedirs(directory)
 
-d = get_dict(contigs_txt=contigs)
-get_fasta(fasta_inp=fasta_inp, dict=d)
-get_gff(gtf_inp=ann, dict=d, type='annot')
-get_gff(gtf_inp=pseudo, dict=d, type='pseudo')
-
-# don't forget to remove directory if braker done
+d = get_dict(contigs_txt=args.contigs)
+lst = [key for key in d]
+print('Species for braker:')
+print(*lst, sep=' ')
+get_fasta(fasta_inp=args.genome, dict=d)
+get_gff(gtf_inp=args.annotation, dict=d, type='annot')
+get_gff(gtf_inp=args.pseudogenes, dict=d, type='pseudo')
 
