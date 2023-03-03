@@ -15,7 +15,13 @@ The goal of this script is to reduce the size of input genome => it helps to tak
 ## convert_coordinates_in_gtfs.py
 The main goal of this script is to map global coordinates from annot.gtf file to coordinates of genome sequence fragments.
 
-These three scripts could be used together:
+## prepare_contigs.py
+This script groups data from fasta and gtf files according to the species type assigned by the Augustify.
+
+## slurm_braker.sh
+It is the way to run BRAKER pipeline using all sequences that were pulled together (for each each parameter set) on the previous step.
+
+* These three scripts could be used together:
 ```
 export N=500000
 # chop up the initial genome:
@@ -31,5 +37,8 @@ export N=500000
 
 # divide data according to the scpecies assigned by Augustify - useful to run braker pipeline
 ./prepare_contigs.py ...
+
+# run BRAKER
+sbatch ./slurm_braker.sh
 
 ```
