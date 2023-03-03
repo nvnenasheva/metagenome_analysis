@@ -20,6 +20,7 @@ This script groups data from fasta and gtf files according to the species type a
 
 ## slurm_braker.sh
 It is the way to run BRAKER pipeline using all sequences that were pulled together (for each each parameter set) on the previous step.
+Variable SPECIES has parameter sets from the prepare_contigs.py output. 
 
 * These three scripts could be used together:
 ```
