@@ -3,6 +3,7 @@ import argparse
 import pandas as pd
 import os
 from Bio import SeqIO
+import csv
 
 __author__ = "Natalia Nenasheva"
 __email__ = "nenashen66@uni-greifswald.de"
@@ -62,7 +63,7 @@ def get_gff(gtf_inp, dict, type):
         #print(key, ' : ', value)
         df_tmp = df.loc[df['header'].isin(value)]
         #print(df_tmp.shape[0])  # no annotation for some contigs?!!???!?!
-        df_tmp.to_csv(gtf_out, header=False, sep='\t', index=False)
+        df_tmp.to_csv(gtf_out, header=False, sep='\t', index=False, quoting=csv.QUOTE_NONE)
     print('Got gtf files:', type)
 
 ''' ******************* END FUNCTIONS *************************************'''
