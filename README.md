@@ -28,9 +28,8 @@ export N=500000
 # chop up the initial genome:
 ./chop_up_genome.py -g genome.fasta.masked -info fly_${N}bp_info.txt -o fly_${N}bp_genome.fasta -l=${N} -n=0 -headers headers_${N}bp.txt
 
-# map the genome annotation (annot.gtf) to this set of fragments:
+# map the genome annotation (annot.gtf) to this set of fragments (this step might be applied for pseudogenes too):
  ./convert_coordinates_in_gtfs.py -headers headers_${N}bp.txt -a annot.gtf -o annot_mapped_${N}.gtf -l=${N}
-# this step might be applied to pseudogenes
  
 # extract 25% sequences randomly:
 ./get_genome_fraction.py -g fly_${N}bp_genome.fasta -o fly_${N}bp_genome_reduced.fasta -f=0.25 -headers=random_headers_${N}.txt
