@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import os
 import glob
+import csv
 
 #####___EXAMPLE___#####
 # convert_coordinates_in_gtfs.py -headers /home/natalia/PycharmProjects/pythonProject/chop_up_genome/headers.txt -a ./annot.gtf -o ./annot_mapped.gtf -l=${N}
@@ -23,10 +24,9 @@ __author__ = "Natalia Nenasheva"
 __email__ = "nenashen66@uni-greifswald.de"
 __status__ = "development"
 
-
 parser = argparse.ArgumentParser(description='convert_coordinates_in_gtfs.py allows ' +
-                                 'to transform coordinates of the initial annotation (-a/--annotation): ' + 
-                                 'the new file corresponds to the coordinate space of the fragmented genome. ' + 
+                                 'to transform coordinates of the initial annotation (-a/--annotation): ' +
+                                 'the new file corresponds to the coordinate space of the fragmented genome. ' +
                                  'Fragment information is taken from the file -headers/--extended_headers.')
 
 parser.add_argument('-headers', '--extended_headers', required=True, type=str,
@@ -45,6 +45,7 @@ args = parser.parse_args()
 
 
 def find_pattern(s, start, end):
+    #print(s)
     return (s.split(start))[1].split(end)[0]
 
 
@@ -98,7 +99,8 @@ def transform_coordinates(dict_child_names, ann_mapped, fragment_length):
 
    # then save them into the dataframe
     df = df[['ch_seq', 'p_tool', 'p_hit', 'ch_hit_start', 'ch_hit_end', 'p_score1', 'p_strand', 'p_score2', 'p_info']]
-    df.to_csv(ann_mapped, sep='\t', index=False, header=False)
+    print(df.iloc[3][['p_info']])
+    df.to_csv(ann_mapped, sep='\t', index=False, header=False, quoting=csv.QUOTE_NONE)
     print("3. Transform coordinates and rename headers for fragments sequences.")
 
 '''
@@ -126,7 +128,6 @@ def remove_tmp():
     except:
         print("Error: %s file not found" % tmp_files)
 
-        
 ''' ******************* END FUNCTIONS *************************************'''
 
 
@@ -145,5 +146,4 @@ remove_tmp()
 
 # rename_headers(input_fasta=args.genome,
 #                output_fasta="mapped_genome.fasta")
-
 
