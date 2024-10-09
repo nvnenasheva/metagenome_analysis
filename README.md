@@ -1,4 +1,4 @@
-# metagenome_analysis
+# Analysis of chopped genomes
 The repository contains additional scripts for the analysis of metagenomic data.
 
 ## chop_up_genome.py
